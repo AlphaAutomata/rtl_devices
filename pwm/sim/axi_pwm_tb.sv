@@ -7,6 +7,23 @@ module axi_pwm_tb();
 	
 	localparam NUM_OUTPUTS    = 4;
 	
+	localparam [11:0][AXI_DATA_WIDTH-1:0] regs_values = {
+		32'd0  ,
+		32'd150,
+		32'd0  ,
+		32'd250,
+		32'd0  ,
+		32'd350,
+		32'd0  ,
+		32'd450,
+		32'd0  ,
+		32'd0  ,
+		32'd500,
+		32'd0  
+	};
+	
+	integer reg_number;
+	
 	wire [NUM_OUTPUTS-1:0]      pwm          ;
 	
 	reg  [AXI_ID_WIDTH-1:0]     s_axi_awid   ;
@@ -85,20 +102,22 @@ module axi_pwm_tb();
 		s_axi_awid    <= 0;
 		s_axi_awaddr  <= 0;
 		s_axi_awprot  <= 0;
-		s_axi_awvalid <= 0;
+		s_axi_awvalid <= 1;
 		
 		s_axi_wdata   <= 0;
 		s_axi_wstrb   <= -1;
-		s_axi_wvalid  <= 0;
+		s_axi_wvalid  <= 1;
 		
 		s_axi_bready  <= 1;
 		
 		s_axi_arid    <= 0;
 		s_axi_araddr  <= 0;
 		s_axi_arprot  <= 0;
-		s_axi_arvalid <= 0;
+		s_axi_arvalid <= 1;
 		
 		s_axi_rready  <= 1;
+		
+		reg_number    <= 0;
 		
 		aclk          <= 1;
 		aresetn       <= 0;
@@ -106,48 +125,23 @@ module axi_pwm_tb();
 		#20;
 		
 		aresetn       <= 1;
-		
-		#9;
-		
-		s_axi_awvalid <= 1;
-		#10;
-		s_axi_awvalid <= 0;
-		
-		#10;
-		
-		s_axi_wdata   <= 0;
-		s_axi_wvalid  <= 1;
-		#10;
-		s_axi_wvalid  <= 0;
-		
-		#10;
-		
-		s_axi_awaddr  <= 4;
-		s_axi_awvalid <= 1;
-		#10;
-		s_axi_awvalid  <= 0;
-		
-		#10;
-		
-		s_axi_wdata   <= 500;
-		s_axi_wvalid  <= 1;
-		#10;
-		s_axi_wvalid  <= 0;
-		
-		#10;
-		
-		s_axi_awaddr  <= 16;
-		s_axi_awvalid <= 1;
-		#10;
-		s_axi_awvalid <= 0;
-		
-		#10;
-		
-		s_axi_wdata   <= 250;
-		s_axi_wvalid  <= 1;
-		#10;
-		s_axi_wvalid  <= 0;
 	end
 	
 	always #5 aclk <= !aclk;
+	
+	always @(posedge(aclk)) begin
+		if (s_axi_awready == 1 && s_axi_awvalid == 1 && aresetn == 1) begin
+			if (reg_number >= 11) begin
+				reg_number <= 0;
+			end else begin
+				reg_number <= reg_number + 1;
+			end
+		end
+		
+		s_axi_awaddr  <= 4*reg_number;
+		
+		s_axi_wdata   <= regs_values[reg_number];
+		
+		s_axi_araddr  <= 4*reg_number;
+	end
 endmodule

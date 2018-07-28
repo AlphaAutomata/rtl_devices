@@ -144,6 +144,8 @@ architecture arch of axi_pwm is
 	signal regs      : reg_bank;
 	signal regs_next : reg_bank;
 	
+	constant AXADDR_REG_JUSTFY_BITS : integer := integer(ceil(log2(real(AXI_DATA_WIDTH/8))));
+	
 	signal reg_index_from_araddr     : integer;
 	signal reg_index_from_awaddr_reg : integer;
 	
@@ -170,11 +172,11 @@ begin
 	
 	reg_index_from_araddr <=
 		to_integer(
-			shift_right(unsigned(s_axi_araddr), integer(floor(log2(real(AXI_DATA_WIDTH/8)))))
+			unsigned(s_axi_araddr(AXI_ADDR_WIDTH-1 downto AXADDR_REG_JUSTFY_BITS))
 		);
 	reg_index_from_awaddr_reg <=
 		to_integer(
-			shift_right(unsigned(s_axi_awaddr_reg), integer(floor(log2(real(AXI_DATA_WIDTH/8)))))
+			unsigned(s_axi_awaddr_reg(AXI_ADDR_WIDTH-1 downto AXADDR_REG_JUSTFY_BITS))
 		);
 	
 	process (
@@ -203,6 +205,7 @@ begin
 		s_axi_rdata      ,
 		s_axi_rresp      ,
 		s_axi_rvalid     ,
+		s_axi_rready     ,
 		wr_state         ,
 		rd_state         ,
 		regs             ,
@@ -238,6 +241,8 @@ begin
 					s_axi_awvalid_reg_next <= s_axi_awvalid;
 					
 					s_axi_awready_next     <= '0';
+					
+					s_axi_wready_next      <= '1';
 				end if;
 				
 			when writing =>
@@ -254,13 +259,13 @@ begin
 					
 					s_axi_wready_next <= '0';
 					
-					s_axi_bid_next       <= s_axi_awid_reg;
-					if (s_axi_awprot_reg = "000") then
-						s_axi_bresp_next <= AXI4_RESP_NMOKAY;
+					s_axi_bid_next    <= s_axi_awid_reg;
+					if (reg_index_from_awaddr_reg < 2*(NUM_OUTPUTS+2)) then
+						s_axi_rresp_next <= AXI4_RESP_NMOKAY;
 					else
-						s_axi_bresp_next <= AXI4_RESP_SLVERR;
+						s_axi_rresp_next <= AXI4_RESP_SLVERR;
 					end if;
-					s_axi_bvalid_next    <= '1';
+					s_axi_bvalid_next <= '1';
 				end if;
 				
 			when responding =>
@@ -278,16 +283,16 @@ begin
 				if (s_axi_arvalid = '1') then
 					rd_state_next <= reading;
 					
-					s_axi_arready_next     <= '0';
+					s_axi_arready_next <= '0';
 					
-					s_axi_rid_next         <= s_axi_arid;
-					s_axi_rdata_next       <= regs(reg_index_from_araddr);
-					if (s_axi_arprot  = "000") then
-						s_axi_rresp_next   <= AXI4_RESP_NMOKAY;
+					s_axi_rid_next     <= s_axi_arid;
+					s_axi_rdata_next   <= regs(reg_index_from_araddr);
+					if (reg_index_from_araddr < 2*(NUM_OUTPUTS+2)) then
+						s_axi_rresp_next <= AXI4_RESP_NMOKAY;
 					else
-						s_axi_rresp_next   <= AXI4_RESP_SLVERR;
+						s_axi_rresp_next <= AXI4_RESP_SLVERR;
 					end if;
-					s_axi_rvalid_next      <= '1';
+					s_axi_rvalid_next  <= '1';
 				end if;
 				
 			when reading =>
@@ -295,7 +300,7 @@ begin
 					rd_state_next <= idle;
 					
 					s_axi_arready_next <= '1';
-					s_axi_bvalid_next  <= '0';
+					s_axi_rvalid_next  <= '0';
 				end if;
 				
 		end case;
