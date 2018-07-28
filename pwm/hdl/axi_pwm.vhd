@@ -370,7 +370,7 @@ begin
 		if (cfg_count_up_down = '1') then
 			if (signed(counter) <= 0) then
 				up_ndown_next <= true;
-			elsif (signed(counter) >= signed(cfg_period)) then
+			elsif (signed(counter) >= signed(cfg_period)/2) then
 				up_ndown_next <= false;
 			end if;
 			
