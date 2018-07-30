@@ -405,7 +405,7 @@ begin
 	
 	GEN_CELLS : for i in 0 to NUM_OUTPUTS-1 generate
 		constant duty_reg_addr  : integer := 2*(i+2);
-		constant pahse_reg_addr : integer := 2*(i+2)+1;
+		constant phase_reg_addr : integer := 2*(i+2)+1;
 		
 		component pwm_cell is
 			generic (
@@ -440,7 +440,7 @@ begin
 			polarity      => cfg_polarity(i),
 			
 			duty  => regs(duty_reg_addr ),
-			phase => regs(pahse_reg_addr)
+			phase => regs(phase_reg_addr)
 		);
 	end generate GEN_CELLS;
 end arch;
