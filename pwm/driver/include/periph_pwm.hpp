@@ -1,12 +1,7 @@
-#ifndef _PHERIH_PWM_H_
-#define _PHERIH_PWM_H_
+#ifndef PHERIH_PWM_HPP
+#define PHERIH_PWM_HPP
 
-#include <stdint.h>
-#include <stdbool.h>
-
-#ifdef __cplusplus
-extern "C" {
-#endif
+#include <cstdint>
 
 typedef enum {
 	pwm_align_edge     = 0,
@@ -86,8 +81,4 @@ void pwm_set_duty(void* dev_base, int32_t duty, uint32_t outputs_to_set);
  */
 void pwm_set_phase(void* dev_base, int32_t phase, uint32_t outputs_to_set);
 
-#ifdef __cplusplus
-}
-#endif
-
-#endif
+#endif // #ifndef PHERIH_PWM_HPP

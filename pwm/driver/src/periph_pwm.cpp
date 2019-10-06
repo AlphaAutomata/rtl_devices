@@ -1,4 +1,4 @@
-#include "periph_pwm.h"
+#include "periph_pwm.hpp"
 
 typedef struct {
 	int32_t duty;
