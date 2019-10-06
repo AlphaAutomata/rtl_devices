@@ -1,96 +1,109 @@
+#include <cstring>
+
 #include "periph_pwm.hpp"
 
-typedef struct {
-	int32_t duty;
-	int32_t phase;
-} output_map;
+using namespace periph;
 
-typedef struct {
-	uint32_t   cfg;
-	uint32_t   period;
-	uint32_t   pol_map;
-	uint32_t   RESERVED_0x0C;
-	output_map out[32];
-} pwm_mem_map;
+/**
+ * Bitwise access struct for PWM peripheral configuration register.
+ */
+struct cfg_reg {
+    std::uint32_t RESERVED_0 : 30; //!< Reserved uppermost 30 bits.
+    pwm::align    alignment  : 1;  //!< The phase alignment mode bit.
+    std::uint32_t RESERVED_1 : 1;  //!< Reserved least-significant-bit.
+};
+static_assert(
+    sizeof( cfg_reg ) == sizeof( std::uint32_t ),
+    "Invalid configuration register struct size"
+);
 
-#define NUM_OUTPUTS 4
+/**
+ * Register-wise access struct for individual PWM output configuration registers.
+ */
+struct output_cfg {
+    std::int32_t duty;  //!< The duty time register.
+    std::int32_t phase; //!< The phase offset register.
+};
 
-#define CAST_MEM_MAP(base) ((pwm_mem_map*)(base))
+/**
+ * Register-wise access struct for memory-mapped PWM peripheral.
+ */
+struct memory_map {
+    cfg_reg                            config;        //!< Device-wide configuration registers.
+    std::uint32_t                      period;        //!< Device-wide PWM pulse period.
+    std::bitset<32>                    pol_map;       //!< Per-output polarity control register.
+    std::uint32_t                      RESERVED_0x0C; //!< Reserved register.
+    std::array<output_cfg,num_outputs> outputs;       //!< Per-output configuration registers.
+};
 
-#define CNT_UP_DOWN_BIT (1 << 1)
+namespace {
 
-void pwm_init(void* dev_base, pwm_info* info) {
-	pwm_set(dev_base, info);
+    /**
+     * Cast a PWM user class to a register memory map.
+     */
+    memory_map& to_map( pwm& dev ) {
+        return *reinterpret_cast<memory_map*>( &dev );
+    }
+
+    /**
+     * Cast a read-only PWM user class to a register memory map.
+     */
+    const memory_map& to_map( const pwm& dev ) {
+        return *reinterpret_cast<const memory_map*>( &dev );
+    }
+
+    /**
+     * Cast a PWM output memory-mapped register block to a register memory map.
+     */
+    output_cfg& to_map( std::array<std::byte,num_outputs>& output ) {
+        return *reinterpret_cast<output_cfg*>( &output );
+    }
+
 }
 
-void pwm_set(void* dev_base, pwm_info* info) {
-	int i;
-	pwm_mem_map* mem;
-	
-	mem = CAST_MEM_MAP(dev_base);
-	
-	switch (info->align) {
-		case pwm_align_edge     : mem->cfg &= ~(CNT_UP_DOWN_BIT); break;
-		case pwm_align_midpulse : mem->cfg |= CNT_UP_DOWN_BIT;    break;
-		default                 : return;
-	}
-	mem->period  = info->period;
-	mem->pol_map = info->pol_map;
-	for (i=0; i<NUM_OUTPUTS; i++) {
-		mem->out[i].duty = info->duty[i];
-	}
+pwm& pwm::operator=( pwm&& rhs ) {
+    *this = rhs;
+    rhs.reset();
+
+    return *this;
 }
 
-void pwm_set_period(void* dev_base, int32_t period) {
-	pwm_mem_map* mem;
-	
-	mem = CAST_MEM_MAP(dev_base);
-	
-	mem->period = period;
+void pwm::reset( void ) {
+    memset( &memory, 0, sizeof(memory) );
 }
 
-void pwm_set_polarity(void* dev_base, uint32_t pol_map) {
-	pwm_mem_map* mem;
-	
-	mem = CAST_MEM_MAP(dev_base);
-	
-	mem->pol_map = pol_map;
+void pwm::set_period( std::int32_t period ) {
+    to_map( *this ).period = period;
 }
 
-void pwm_set_alignment(void* dev_base, pwm_eAlignment align) {
-	pwm_mem_map* mem;
-	
-	mem = CAST_MEM_MAP(dev_base);
-	
-	switch (align) {
-		case pwm_align_edge     : mem->cfg &= ~(CNT_UP_DOWN_BIT);
-		case pwm_align_midpulse : mem->cfg |= CNT_UP_DOWN_BIT;
-		default                 : return;
-	}
+void pwm::set_polarity_all( std::bitset<num_outputs> polarity_map ) {
+    to_map( *this ).pol_map = polarity_map;
 }
 
-void pwm_set_duty(void* dev_base, int32_t duty, uint32_t outputs_to_set) {
-	int i;
-	pwm_mem_map* mem;
-	
-	mem = CAST_MEM_MAP(dev_base);
-	
-	for (i=0; i<NUM_OUTPUTS; i++) {
-		if ((outputs_to_set >> i) & 0x00000001) {
-			mem->out[i].duty = duty;
-		}
-	}
+std::bitset<num_outputs> pwm::read_polarity_all( void ) const {
+    return to_map( *this ).pol_map;
 }
 
-void pwm_set_phase(void* dev_base, int32_t phase, uint32_t outputs_to_set) {
-	int i;
-	pwm_mem_map* mem;
-	
-	mem = CAST_MEM_MAP(dev_base);
-	
-	for (i=0; i<NUM_OUTPUTS; i++) {
-		if ((outputs_to_set >> i) & 0x00000001) {
-			mem->out[i].phase = phase;
-		}
-	}
+void pwm::set_alignment( align mode ) {
+    to_map( *this ).config.alignment = mode;
+}
+
+void pwm::set_duty_all( std::int32_t duty ) {
+    for ( auto& output : to_map( *this ).outputs ) {
+        output.duty = duty;
+    }
+}
+
+void pwm::set_phase_all( std::int32_t phase ) {
+    for ( auto& output : to_map( *this ).outputs ) {
+        output.phase = phase;
+    }
+}
+
+void pwm::set_duty_priv( output& signal, std::int32_t duty ) {
+    to_map( signal ).duty = duty;
+}
+
+void pwm::set_phase_priv( output& signal, std::int32_t phase ) {
+    to_map( signal ).phase = phase;
 }
