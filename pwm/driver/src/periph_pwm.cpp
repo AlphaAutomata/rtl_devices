@@ -4,39 +4,43 @@
 
 using namespace periph;
 
-/**
- * Bitwise access struct for PWM peripheral configuration register.
- */
-struct cfg_reg {
-    std::uint32_t RESERVED_0 : 30; //!< Reserved uppermost 30 bits.
-    pwm::align    alignment  : 1;  //!< The phase alignment mode bit.
-    std::uint32_t RESERVED_1 : 1;  //!< Reserved least-significant-bit.
-};
-static_assert(
-    sizeof( cfg_reg ) == sizeof( std::uint32_t ),
-    "Invalid configuration register struct size"
-);
-
-/**
- * Register-wise access struct for individual PWM output configuration registers.
- */
-struct output_cfg {
-    std::int32_t duty;  //!< The duty time register.
-    std::int32_t phase; //!< The phase offset register.
-};
-
-/**
- * Register-wise access struct for memory-mapped PWM peripheral.
- */
-struct memory_map {
-    cfg_reg                            config;        //!< Device-wide configuration registers.
-    std::uint32_t                      period;        //!< Device-wide PWM pulse period.
-    std::bitset<32>                    pol_map;       //!< Per-output polarity control register.
-    std::uint32_t                      RESERVED_0x0C; //!< Reserved register.
-    std::array<output_cfg,num_outputs> outputs;       //!< Per-output configuration registers.
-};
-
 namespace {
+
+    /**
+     * Bitwise access struct for PWM peripheral configuration register.
+     */
+    struct cfg_reg {
+        std::uint32_t RESERVED_0 : 30; //!< Reserved uppermost 30 bits.
+        pwm::align    alignment  : 1;  //!< The phase alignment mode bit.
+        std::uint32_t RESERVED_1 : 1;  //!< Reserved least-significant-bit.
+    };
+    static_assert(
+        sizeof( cfg_reg ) == sizeof( std::uint32_t ),
+        "Invalid configuration register struct size"
+    );
+
+    /**
+     * Register-wise access struct for individual PWM output configuration registers.
+     */
+    struct output_cfg {
+        std::int32_t duty;  //!< The duty time register.
+        std::int32_t phase; //!< The phase offset register.
+    };
+
+    /**
+     * Register-wise access struct for memory-mapped PWM peripheral.
+     */
+    struct memory_map {
+        cfg_reg                            config;        //!< Device-wide configuration registers.
+        std::uint32_t                      period;        //!< Device-wide PWM pulse period.
+        std::bitset<32>                    pol_map;       //!< Per-output polarity control register.
+        std::uint32_t                      RESERVED_0x0C; //!< Reserved register.
+        std::array<output_cfg,num_outputs> outputs;       //!< Per-output configuration registers.
+    };
+    static_assert(
+        sizeof( pwm ) == sizeof( memory_map ),
+        "User handle and register memory map size mismatch"
+    );
 
     /**
      * Cast a PWM user class to a register memory map.
@@ -55,7 +59,12 @@ namespace {
     /**
      * Cast a PWM output memory-mapped register block to a register memory map.
      */
-    output_cfg& to_map( std::array<std::byte,num_outputs>& output ) {
+    output_cfg& to_map( std::array<std::byte,output_size>& output ) {
+        static_assert(
+            sizeof( output ) == sizeof( output_cfg ),
+            "User handle and register memory map size mismatch"
+        );
+
         return *reinterpret_cast<output_cfg*>( &output );
     }
 

@@ -10,6 +10,7 @@
 namespace periph {
 
     constexpr std::size_t header_size = 16; //!< The size of the PWM peripheral configuration block.
+    constexpr std::size_t output_size = 8;  //!< The size of a register block controlling one PWM.
     constexpr std::size_t num_outputs = 32; //!< The number of hardware PWM outputs.
 
     /**
@@ -159,7 +160,7 @@ namespace periph {
             /**
              * Size-equivalent stand-in for registers controlling a single PWM output.
              */
-            using output = std::array<std::byte,num_outputs>;
+            using output = std::array<std::byte,output_size>;
 
             /**
              * Size-equivalent stand-in for all memory-mapped registers in this peripheral device.
