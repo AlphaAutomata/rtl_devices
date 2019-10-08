@@ -47,7 +47,7 @@ namespace {
      * 
      * \tparam T The normal type to cast to.
      * 
-     * \param [in] val The value to cast.
+     * \param[in] val The value to cast.
      * 
      * \return Returns the original value cast to a normal type.
      */
@@ -58,6 +58,10 @@ namespace {
 
     /**
      * Cast a PWM user class to a register memory map.
+     * 
+     * \param[in] dev The opaque user PWM class to cast.
+     * 
+     * \return Returns the memory-mapped registers corresponding to the opaque user class.
      */
     memory_map& to_map( pwm& dev ) {
         return *reinterpret_cast<memory_map*>( &dev );
@@ -65,6 +69,10 @@ namespace {
 
     /**
      * Cast a read-only PWM user class to a register memory map.
+     * 
+     * \param[in] dev The read-only opaque user PWM class to cast.
+     * 
+     * \return Returns the read-only memory-mapped registers corresponding to the opaque user class.
      */
     const memory_map& to_map( const pwm& dev ) {
         return *reinterpret_cast<const memory_map*>( &dev );
@@ -72,6 +80,10 @@ namespace {
 
     /**
      * Cast a PWM output memory-mapped register block to a register memory map.
+     * 
+     * \param[in] dev The opaque memory block mapped to registers controlling a single PWM output.
+     * 
+     * \return Returns the memory-mapped registers at the given memory block.
      */
     output_cfg& to_map( std::array<volatile std::byte,output_size>& output ) {
         static_assert(
