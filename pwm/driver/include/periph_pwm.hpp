@@ -75,17 +75,18 @@ namespace periph {
              * \param polarity The polarity to set the given PWM output to.
              */
             template<std::size_t N>
-            void set_polarity( std::bitset<1> polarity );
+            void set_polarity( bool polarity );
 
             /**
              * Read the polarity of a single PWM output.
              * 
              * \tparam N The index of the PWM output to read the polarity of.
              * 
-             * \return Returns the polarity of the specified output.
+             * \retval true  The polarity of the PWM signal is high.
+             * \retval false The polarity of the PWM signal is low.
              */
             template<std::size_t N>
-            std::bitset<1> read_polarity( void ) const;
+            bool read_polarity( void ) const;
 
             /**
              * Set the polarities of all PWM outputs.
@@ -160,14 +161,14 @@ namespace periph {
             /**
              * Size-equivalent stand-in for registers controlling a single PWM output.
              */
-            using output = std::array<std::byte,output_size>;
+            using output = std::array<volatile std::byte,output_size>;
 
             /**
              * Size-equivalent stand-in for all memory-mapped registers in this peripheral device.
              */
             struct {
-                std::array<std::byte,header_size> header;  //!< Global configuration registers.
-                std::array<output,num_outputs>    outputs; //!< Individual output registers.
+                std::array<volatile std::byte,header_size> header;  //!< Global configuration registers.
+                std::array<output,num_outputs>             outputs; //!< Individual output registers.
             } memory;
 
             /**

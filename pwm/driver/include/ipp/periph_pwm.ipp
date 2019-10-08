@@ -2,23 +2,20 @@
 namespace periph {
 
     template<std::size_t N>
-    void pwm::set_polarity( std::bitset<1> polarity ) {
+    void pwm::set_polarity( bool polarity ) {
         static_assert( ( N >= 0 ) && ( N < num_outputs ), "Invalid PWM output index" );
 
         auto pols = read_polarity_all();
-        pols.set( N, polarity[0] );
+        pols.set( N, polarity );
 
         set_polarity_all( pols );
     }
 
     template<std::size_t N>
-    std::bitset<1> pwm::read_polarity( void ) const {
+    bool pwm::read_polarity( void ) const {
         static_assert( ( N >= 0 ) && ( N < num_outputs ), "Invalid PWM output index" );
 
-        std::bitset<1> ret;
-        ret[0] = read_polarity_all()[N];
-
-        return ret;
+        return read_polarity_all()[N];
     }
 
     template<std::size_t N>
