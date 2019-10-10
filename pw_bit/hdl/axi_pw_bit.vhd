@@ -349,7 +349,7 @@ begin
                 COUNTER_WIDTH : integer := 32;
 
                 DATA_AXIS_DATA_WIDTH : integer := 8;
-                CFG_AXIS_DATA_WIDTH  : integer := 96
+                CFG_AXIS_DATA_WIDTH  : integer := 32
             );
             port (
                 txd : out std_logic;
@@ -368,7 +368,9 @@ begin
             );
         end component;
     begin
-        data_valid(i) <= s_axi_wvalid when (reg_index_from_awaddr_reg = data_reg_addr) else '0';
+        data_valid(i) <=
+            s_axi_wvalid and s_axi_wready when (reg_index_from_awaddr_reg = data_reg_addr) else
+            '0';
 
         cell : pw_bit_cell
         generic map (
