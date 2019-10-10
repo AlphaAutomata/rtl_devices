@@ -3,6 +3,9 @@ use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 use ieee.math_real.all;
 
+library xpm;
+use xpm.vcomponents.all;
+
 entity axi_pw_bit is
     generic (
         AXI_ID_WIDTH   : integer := 1;
@@ -148,9 +151,6 @@ architecture arch of axi_pw_bit is
     
     signal reg_index_from_araddr     : integer;
     signal reg_index_from_awaddr_reg : integer;
-
-    signal data_valid : std_logic_vector(NUM_OUTPUTS-1 downto 0);
-    signal data_ready : std_logic_vector(NUM_OUTPUTS-1 downto 0);
 begin
     --------------------------
     -- AXI-4 Lite Registers --
@@ -343,7 +343,7 @@ begin
         constant period_reg_addr  : integer := 4*i+1;
         constant duty_hi_reg_addr : integer := 4*i+2;
         constant duty_lo_reg_addr : integer := 4*i+3;
-        
+
         component pw_bit_cell is
             generic (
                 COUNTER_WIDTH : integer := 32;
@@ -367,10 +367,72 @@ begin
                 aresetn : in std_logic
             );
         end component;
+
+        signal fifo_wr_en : std_logic;
+        signal fifo_din   : std_logic_vector(AXI_DATA_WIDTH-1 downto 0);
+
+        signal cell_s_axis_tdata  : std_logic_vector(AXI_DATA_WIDTH-1 downto 0);
+        signal cell_s_axis_tlast  : std_logic;
+        signal cell_s_axis_tvalid : std_logic;
+        signal cell_s_axis_tready : std_logic;
+
+        signal fifo_rd_en : std_logic;
+        signal fifo_dout  : std_logic_vector(AXI_DATA_WIDTH-1 downto 0);
+        signal fifo_empty : std_logic;
     begin
-        data_valid(i) <=
+        fifo_wr_en <=
             s_axi_wvalid and s_axi_wready when (reg_index_from_awaddr_reg = data_reg_addr) else
             '0';
+        fifo_din <= s_axi_wdata;
+
+        fifo_rd_en <= cell_s_axis_tready and cell_s_axis_tvalid;
+
+        data_fifo : xpm_fifo_sync
+        generic map (
+            FIFO_MEMORY_TYPE    => "auto"        , --string; "auto", "block", "distributed", or "ultra" ;
+            ECC_MODE            => "no_ecc"      , --string; "no_ecc" or "en_ecc";
+            FIFO_WRITE_DEPTH    => 2048          , --positive integer
+            WRITE_DATA_WIDTH    => AXI_DATA_WIDTH, --positive integer
+            WR_DATA_COUNT_WIDTH => 12            , --positive integer
+            PROG_FULL_THRESH    => 10            , --positive integer
+            FULL_RESET_VALUE    => 0             , --positive integer; 0 or 1;
+            READ_MODE           => "std"         , --string; "std" or "fwft";
+            FIFO_READ_LATENCY   => 1             , --positive integer;
+            READ_DATA_WIDTH     => 32            , --positive integer
+            RD_DATA_COUNT_WIDTH => 12            , --positive integer
+            PROG_EMPTY_THRESH   => 10            , --positive integer
+            DOUT_RESET_VALUE    => "0"           , --string
+            WAKEUP_TIME         => 0               --positive integer; 0 or 2;
+        ) port map (
+            wr_en         => fifo_wr_en,
+            din           => fifo_din  ,
+            full          => open,
+            overflow      => open,
+            wr_rst_busy   => open,
+
+            rd_en         => fifo_rd_en,
+            dout          => fifo_dout ,
+            empty         => fifo_empty,
+            underflow     => open,
+            rd_rst_busy   => open,
+
+            prog_full     => open,
+            wr_data_count => open,
+            prog_empty    => open,
+            rd_data_count => open,
+            sleep         => '0',
+            injectsbiterr => '0',
+            injectdbiterr => '0',
+            sbiterr       => open,
+            dbiterr       => open,
+
+            wr_clk        => aclk,
+            rst           => not aresetn
+        );
+
+        cell_s_axis_tdata  <= fifo_dout;
+        cell_s_axis_tlast  <= '0';
+        cell_s_axis_tvalid <= not fifo_empty;
 
         cell : pw_bit_cell
         generic map (
@@ -381,10 +443,10 @@ begin
         ) port map (
             txd => txd(i),
 
-            data_s_axis_tdata  => s_axi_wdata,
-            data_s_axis_tlast  => '0',
-            data_s_axis_tvalid => data_valid(i),
-            data_s_axis_tready => data_ready(i),
+            data_s_axis_tdata  => cell_s_axis_tdata ,
+            data_s_axis_tlast  => cell_s_axis_tlast ,
+            data_s_axis_tvalid => cell_s_axis_tvalid,
+            data_s_axis_tready => cell_s_axis_tready,
 
             period  => regs(period_reg_addr ),
             duty_hi => regs(duty_hi_reg_addr),
