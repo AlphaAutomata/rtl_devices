@@ -57,6 +57,8 @@ set(PWM_INC_FILES ${PWM_INC_DIR}/periph_pwm.hpp)
 set(PWM_IPP_FILES ${PWM_IPP_DIR}/periph_pwm.ipp)
 set(PWM_SRC_FILES ${PWM_SRC_DIR}/periph_pwm.cpp)
 
+set(TEST_PWM_SRC_FILES ${PWM_DIR}/test/test_pwm.cpp PARENT_SCOPE)
+
 ############################
 # Configure Library Target #
 ############################
