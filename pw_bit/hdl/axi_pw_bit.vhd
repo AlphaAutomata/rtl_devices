@@ -139,9 +139,11 @@ architecture arch of axi_pw_bit is
     ---------------------
     -- Register Access --
     ---------------------
-    
+
+    constant NUM_REGS : integer := 8*NUM_OUTPUTS;
+
     type reg_bank is array (
-        8*NUM_OUTPUTS-1 downto 0
+        NUM_REGS-1 downto 0
     ) of std_logic_vector(
         AXI_DATA_WIDTH-1 downto 0
     );
@@ -241,14 +243,14 @@ begin
                         if (s_axi_wstrb(i) = '1') then
                             regs_next
                                 (reg_index_from_awaddr_reg)
-                                (8*(i+1)-1 downto 8*i)      <= s_axi_wdata(8*(i+1)-1 downto 8*i);
+                                (8*(i+1)-1 downto 8*i) <= s_axi_wdata(8*(i+1)-1 downto 8*i);
                         end if;
                     end loop;
                     
                     s_axi_wready_next <= '0';
                     
                     s_axi_bid_next    <= s_axi_awid_reg;
-                    if (reg_index_from_awaddr_reg < 2*(NUM_OUTPUTS+2)) then
+                    if (reg_index_from_awaddr_reg < NUM_REGS) then
                         s_axi_rresp_next <= AXI4_RESP_NMOKAY;
                     else
                         s_axi_rresp_next <= AXI4_RESP_SLVERR;
@@ -275,7 +277,7 @@ begin
                     
                     s_axi_rid_next     <= s_axi_arid;
                     s_axi_rdata_next   <= regs(reg_index_from_araddr);
-                    if (reg_index_from_araddr < 2*(NUM_OUTPUTS+2)) then
+                    if (reg_index_from_araddr < NUM_REGS) then
                         s_axi_rresp_next <= AXI4_RESP_NMOKAY;
                     else
                         s_axi_rresp_next <= AXI4_RESP_SLVERR;
