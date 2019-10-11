@@ -7,26 +7,42 @@ module axi_pw_bit_tb();
     
     localparam NUM_OUTPUTS    = 4;
     
-    localparam [15:0][AXI_DATA_WIDTH-1:0] regs_values = {
-        32'd15,
-        32'd30,
-        32'd60,
+    localparam [31:0][AXI_DATA_WIDTH-1:0] regs_values = {
         32'd0 ,
         32'd15,
         32'd30,
         32'd60,
         32'd0 ,
-        32'd15,
-        32'd30,
-        32'd60,
+        32'd0 ,
+        32'h00000007,
+        32'd0 ,
         32'd0 ,
         32'd15,
         32'd30,
         32'd60,
+        32'd0 ,
+        32'd0 ,
+        32'h00000007,
+        32'd0 ,
+        32'd0 ,
+        32'd15,
+        32'd30,
+        32'd60,
+        32'd0 ,
+        32'd0 ,
+        32'h00000007,
+        32'd0 ,
+        32'd0 ,
+        32'd15,
+        32'd30,
+        32'd60,
+        32'd0 ,
+        32'd0 ,
+        32'h00000007,
         32'd0 
     };
     
-    reg [15:0][AXI_DATA_WIDTH-1:0] regs;
+    reg [31:0][AXI_DATA_WIDTH-1:0] regs;
 
     integer write_cntdwn;
 
@@ -145,11 +161,11 @@ module axi_pw_bit_tb();
         if (aresetn == 1) begin
             if (write_cntdwn == 0) begin
                 write_cntdwn <= 3000;
-                reg_number   <= 15;
+                reg_number   <= 31;
                 regs[0]      <= regs[0] + 1;
-                regs[4]      <= regs[4] + 1;
                 regs[8]      <= regs[8] + 1;
-                regs[12]     <= regs[12] + 1;
+                regs[16]     <= regs[16] + 1;
+                regs[24]     <= regs[24] + 1;
             end else begin
                 write_cntdwn <= write_cntdwn - 1;
             end

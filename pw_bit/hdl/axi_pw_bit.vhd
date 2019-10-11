@@ -139,7 +139,7 @@ architecture arch of axi_pw_bit is
     ---------------------
     
     type reg_bank is array (
-        4*NUM_OUTPUTS-1 downto 0
+        8*NUM_OUTPUTS-1 downto 0
     ) of std_logic_vector(
         AXI_DATA_WIDTH-1 downto 0
     );
@@ -339,29 +339,33 @@ begin
     ------------------------
     
     GEN_CELLS : for i in 0 to NUM_OUTPUTS-1 generate
-        constant data_reg_addr    : integer := 4*i;
-        constant period_reg_addr  : integer := 4*i+1;
-        constant duty_hi_reg_addr : integer := 4*i+2;
-        constant duty_lo_reg_addr : integer := 4*i+3;
+        constant data_reg_addr       : integer := 8*i;
+        constant data_bmask_reg_addr : integer := 8*i+1;
+        constant period_reg_addr     : integer := 8*i+4;
+        constant duty_hi_reg_addr    : integer := 8*i+5;
+        constant duty_lo_reg_addr    : integer := 8*i+6;
+
+        constant BMASK_NUM_BITS : integer := AXI_DATA_WIDTH/8;
+
+        constant FIFO_DATA_WIDTH : integer := AXI_DATA_WIDTH + BMASK_NUM_BITS;
 
         component pw_bit_cell is
             generic (
-                COUNTER_WIDTH : integer := 32;
-
-                DATA_AXIS_DATA_WIDTH : integer := 8;
-                CFG_AXIS_DATA_WIDTH  : integer := 32
+                COUNTER_WIDTH   : integer := 32;
+                AXIS_DATA_WIDTH : integer := 8
             );
             port (
                 txd : out std_logic;
 
-                data_s_axis_tdata  : in  std_logic_vector(DATA_AXIS_DATA_WIDTH-1 downto 0);
-                data_s_axis_tlast  : in  std_logic;
-                data_s_axis_tvalid : in  std_logic;
-                data_s_axis_tready : out std_logic;
+                s_axis_tdata  : in  std_logic_vector(AXIS_DATA_WIDTH-1 downto 0);
+                s_axis_tstrb  : in  std_logic_vector(AXIS_DATA_WIDTH/8-1 downto 0);
+                s_axis_tlast  : in  std_logic;
+                s_axis_tvalid : in  std_logic;
+                s_axis_tready : out std_logic;
 
-                period  : in std_logic_vector(CFG_AXIS_DATA_WIDTH-1 downto 0);
-                duty_hi : in std_logic_vector(CFG_AXIS_DATA_WIDTH-1 downto 0);
-                duty_lo : in std_logic_vector(CFG_AXIS_DATA_WIDTH-1 downto 0);
+                period  : in std_logic_vector(COUNTER_WIDTH-1 downto 0);
+                duty_hi : in std_logic_vector(COUNTER_WIDTH-1 downto 0);
+                duty_lo : in std_logic_vector(COUNTER_WIDTH-1 downto 0);
 
                 aclk    : in std_logic;
                 aresetn : in std_logic
@@ -369,40 +373,41 @@ begin
         end component;
 
         signal fifo_wr_en : std_logic;
-        signal fifo_din   : std_logic_vector(AXI_DATA_WIDTH-1 downto 0);
+        signal fifo_din   : std_logic_vector(FIFO_DATA_WIDTH-1 downto 0);
 
         signal cell_s_axis_tdata  : std_logic_vector(AXI_DATA_WIDTH-1 downto 0);
+        signal cell_s_axis_tstrb  : std_logic_vector(AXI_DATA_WIDTH/8-1 downto 0);
         signal cell_s_axis_tlast  : std_logic;
         signal cell_s_axis_tvalid : std_logic;
         signal cell_s_axis_tready : std_logic;
 
         signal fifo_rd_en : std_logic;
-        signal fifo_dout  : std_logic_vector(AXI_DATA_WIDTH-1 downto 0);
+        signal fifo_dout  : std_logic_vector(FIFO_DATA_WIDTH-1 downto 0);
         signal fifo_empty : std_logic;
     begin
         fifo_wr_en <=
             s_axi_wvalid and s_axi_wready when (reg_index_from_awaddr_reg = data_reg_addr) else
             '0';
-        fifo_din <= s_axi_wdata;
+        fifo_din <= regs(data_bmask_reg_addr)(BMASK_NUM_BITS-1 downto 0) & s_axi_wdata;
 
-        fifo_rd_en <= cell_s_axis_tready and cell_s_axis_tvalid;
+        fifo_rd_en <= cell_s_axis_tready and not fifo_empty;
 
         data_fifo : xpm_fifo_sync
         generic map (
-            FIFO_MEMORY_TYPE    => "auto"        , --string; "auto", "block", "distributed", or "ultra" ;
-            ECC_MODE            => "no_ecc"      , --string; "no_ecc" or "en_ecc";
-            FIFO_WRITE_DEPTH    => 2048          , --positive integer
-            WRITE_DATA_WIDTH    => AXI_DATA_WIDTH, --positive integer
-            WR_DATA_COUNT_WIDTH => 12            , --positive integer
-            PROG_FULL_THRESH    => 10            , --positive integer
-            FULL_RESET_VALUE    => 0             , --positive integer; 0 or 1;
-            READ_MODE           => "std"         , --string; "std" or "fwft";
-            FIFO_READ_LATENCY   => 1             , --positive integer;
-            READ_DATA_WIDTH     => 32            , --positive integer
-            RD_DATA_COUNT_WIDTH => 12            , --positive integer
-            PROG_EMPTY_THRESH   => 10            , --positive integer
-            DOUT_RESET_VALUE    => "0"           , --string
-            WAKEUP_TIME         => 0               --positive integer; 0 or 2;
+            FIFO_MEMORY_TYPE    => "auto"         , --string; "auto", "block", "distributed", or "ultra" ;
+            ECC_MODE            => "no_ecc"       , --string; "no_ecc" or "en_ecc";
+            FIFO_WRITE_DEPTH    => 2048           , --positive integer
+            WRITE_DATA_WIDTH    => FIFO_DATA_WIDTH, --positive integer
+            WR_DATA_COUNT_WIDTH => 12             , --positive integer
+            PROG_FULL_THRESH    => 10             , --positive integer
+            FULL_RESET_VALUE    => 0              , --positive integer; 0 or 1;
+            READ_MODE           => "std"          , --string; "std" or "fwft";
+            FIFO_READ_LATENCY   => 1              , --positive integer;
+            READ_DATA_WIDTH     => FIFO_DATA_WIDTH, --positive integer
+            RD_DATA_COUNT_WIDTH => 12             , --positive integer
+            PROG_EMPTY_THRESH   => 10             , --positive integer
+            DOUT_RESET_VALUE    => "0"            , --string
+            WAKEUP_TIME         => 0                --positive integer; 0 or 2;
         ) port map (
             wr_en         => fifo_wr_en,
             din           => fifo_din  ,
@@ -430,23 +435,32 @@ begin
             rst           => not aresetn
         );
 
-        cell_s_axis_tdata  <= fifo_dout;
+        cell_s_axis_tdata  <= fifo_dout(AXI_DATA_WIDTH-1 downto 0);
+        cell_s_axis_tstrb  <= fifo_dout(FIFO_DATA_WIDTH-1 downto FIFO_DATA_WIDTH-BMASK_NUM_BITS);
         cell_s_axis_tlast  <= '0';
-        cell_s_axis_tvalid <= not fifo_empty;
+
+        process (aclk) begin
+            if (rising_edge(aclk)) then
+                if (aresetn = '0') then
+                    cell_s_axis_tvalid <= '0';
+                else
+                    cell_s_axis_tvalid <= fifo_rd_en;
+                end if;
+            end if;
+        end process;
 
         cell : pw_bit_cell
         generic map (
-            COUNTER_WIDTH => AXI_DATA_WIDTH,
-
-            DATA_AXIS_DATA_WIDTH => AXI_DATA_WIDTH,
-            CFG_AXIS_DATA_WIDTH  => AXI_DATA_WIDTH
+            COUNTER_WIDTH   => AXI_DATA_WIDTH,
+            AXIS_DATA_WIDTH => AXI_DATA_WIDTH
         ) port map (
             txd => txd(i),
 
-            data_s_axis_tdata  => cell_s_axis_tdata ,
-            data_s_axis_tlast  => cell_s_axis_tlast ,
-            data_s_axis_tvalid => cell_s_axis_tvalid,
-            data_s_axis_tready => cell_s_axis_tready,
+            s_axis_tdata  => cell_s_axis_tdata ,
+            s_axis_tstrb  => cell_s_axis_tstrb ,
+            s_axis_tlast  => cell_s_axis_tlast ,
+            s_axis_tvalid => cell_s_axis_tvalid,
+            s_axis_tready => cell_s_axis_tready,
 
             period  => regs(period_reg_addr ),
             duty_hi => regs(duty_hi_reg_addr),
