@@ -125,7 +125,7 @@ module axi_pw_bit_tb();
     initial begin
         regs <= regs_values;
 
-        write_cntdwn <= 100;
+        write_cntdwn <= 300;
 
         s_axi_awid    <= 0;
         s_axi_awaddr  <= 0;
@@ -150,7 +150,7 @@ module axi_pw_bit_tb();
         aclk          <= 1;
         aresetn       <= 0;
         
-        #20;
+        #200;
         
         aresetn       <= 1;
     end

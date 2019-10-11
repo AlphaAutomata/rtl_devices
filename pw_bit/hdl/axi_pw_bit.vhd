@@ -3,8 +3,10 @@ use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 use ieee.math_real.all;
 
-library xpm;
-use xpm.vcomponents.all;
+library unisim;
+use unisim.vcomponents.all;
+library unimacro;
+use unimacro.vcomponents.all;
 
 entity axi_pw_bit is
     generic (
@@ -372,8 +374,8 @@ begin
             );
         end component;
 
-        signal fifo_wr_en : std_logic;
-        signal fifo_din   : std_logic_vector(FIFO_DATA_WIDTH-1 downto 0);
+        signal fifo_wren : std_logic;
+        signal fifo_di   : std_logic_vector(FIFO_DATA_WIDTH-1 downto 0);
 
         signal cell_s_axis_tdata  : std_logic_vector(AXI_DATA_WIDTH-1 downto 0);
         signal cell_s_axis_tstrb  : std_logic_vector(AXI_DATA_WIDTH/8-1 downto 0);
@@ -381,62 +383,45 @@ begin
         signal cell_s_axis_tvalid : std_logic;
         signal cell_s_axis_tready : std_logic;
 
-        signal fifo_rd_en : std_logic;
-        signal fifo_dout  : std_logic_vector(FIFO_DATA_WIDTH-1 downto 0);
+        signal fifo_rden  : std_logic;
+        signal fifo_do    : std_logic_vector(FIFO_DATA_WIDTH-1 downto 0);
         signal fifo_empty : std_logic;
     begin
-        fifo_wr_en <=
+        fifo_wren <=
             s_axi_wvalid and s_axi_wready when (reg_index_from_awaddr_reg = data_reg_addr) else
             '0';
-        fifo_din <= regs(data_bmask_reg_addr)(BMASK_NUM_BITS-1 downto 0) & s_axi_wdata;
+        fifo_di <= regs(data_bmask_reg_addr)(BMASK_NUM_BITS-1 downto 0) & s_axi_wdata;
 
-        fifo_rd_en <= cell_s_axis_tready and not fifo_empty;
+        fifo_rden <= cell_s_axis_tready and not fifo_empty;
 
-        data_fifo : xpm_fifo_sync
+        data_fifo : fifo_sync_macro
         generic map (
-            FIFO_MEMORY_TYPE    => "auto"         , --string; "auto", "block", "distributed", or "ultra" ;
-            ECC_MODE            => "no_ecc"       , --string; "no_ecc" or "en_ecc";
-            FIFO_WRITE_DEPTH    => 2048           , --positive integer
-            WRITE_DATA_WIDTH    => FIFO_DATA_WIDTH, --positive integer
-            WR_DATA_COUNT_WIDTH => 12             , --positive integer
-            PROG_FULL_THRESH    => 10             , --positive integer
-            FULL_RESET_VALUE    => 0              , --positive integer; 0 or 1;
-            READ_MODE           => "std"          , --string; "std" or "fwft";
-            FIFO_READ_LATENCY   => 1              , --positive integer;
-            READ_DATA_WIDTH     => FIFO_DATA_WIDTH, --positive integer
-            RD_DATA_COUNT_WIDTH => 12             , --positive integer
-            PROG_EMPTY_THRESH   => 10             , --positive integer
-            DOUT_RESET_VALUE    => "0"            , --string
-            WAKEUP_TIME         => 0                --positive integer; 0 or 2;
-        ) port map (
-            wr_en         => fifo_wr_en,
-            din           => fifo_din  ,
-            full          => open,
-            overflow      => open,
-            wr_rst_busy   => open,
+            DEVICE              => "7SERIES",       -- Target Device: "VIRTEX5, "VIRTEX6", "7SERIES"
+            ALMOST_FULL_OFFSET  => X"0080",         -- Sets almost full threshold
+            ALMOST_EMPTY_OFFSET => X"0080",         -- Sets the almost empty threshold
+            DATA_WIDTH          => FIFO_DATA_WIDTH, -- Valid values are 1-72 (37-72 only valid when FIFO_SIZE="36Kb")
+            FIFO_SIZE           => "36Kb")          -- Target BRAM, "18Kb" or "36Kb"
+        port map (
+            wren        => fifo_wren,  -- 1-bit input write enable
+            di          => fifo_di,    -- Input data, width defined by DATA_WIDTH parameter
+            almostfull  => open,       -- 1-bit output almost full
+            full        => open,       -- 1-bit output full
+            wrcount     => open,       -- Output write count, width determined by FIFO depth
+            wrerr       => open,       -- 1-bit output write error
 
-            rd_en         => fifo_rd_en,
-            dout          => fifo_dout ,
-            empty         => fifo_empty,
-            underflow     => open,
-            rd_rst_busy   => open,
+            rden        => fifo_rden,  -- 1-bit input read enable
+            do          => fifo_do,    -- Output data, width defined by DATA_WIDTH parameter
+            almostempty => open,       -- 1-bit output almost empty
+            empty       => fifo_empty, -- 1-bit output empty
+            rdcount     => open,       -- Output read count, width determined by FIFO depth
+            rderr       => open,       -- 1-bit output read error
 
-            prog_full     => open,
-            wr_data_count => open,
-            prog_empty    => open,
-            rd_data_count => open,
-            sleep         => '0',
-            injectsbiterr => '0',
-            injectdbiterr => '0',
-            sbiterr       => open,
-            dbiterr       => open,
-
-            wr_clk        => aclk,
-            rst           => not aresetn
+            clk         => aclk,       -- 1-bit input clock
+            rst         => not aresetn -- 1-bit input reset
         );
 
-        cell_s_axis_tdata  <= fifo_dout(AXI_DATA_WIDTH-1 downto 0);
-        cell_s_axis_tstrb  <= fifo_dout(FIFO_DATA_WIDTH-1 downto FIFO_DATA_WIDTH-BMASK_NUM_BITS);
+        cell_s_axis_tdata  <= fifo_do(AXI_DATA_WIDTH-1 downto 0);
+        cell_s_axis_tstrb  <= fifo_do(FIFO_DATA_WIDTH-1 downto FIFO_DATA_WIDTH-BMASK_NUM_BITS);
         cell_s_axis_tlast  <= '0';
 
         process (aclk) begin
@@ -444,7 +429,7 @@ begin
                 if (aresetn = '0') then
                     cell_s_axis_tvalid <= '0';
                 else
-                    cell_s_axis_tvalid <= fifo_rd_en;
+                    cell_s_axis_tvalid <= fifo_rden;
                 end if;
             end if;
         end process;
