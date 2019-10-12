@@ -49,6 +49,12 @@ set(PWM_INC_DIR ${PWM_DIR}/include)
 set(PWM_IPP_DIR ${PWM_INC_DIR}/ipp)
 set(PWM_SRC_DIR ${PWM_DIR}/src)
 
+set(PWB_DIR ${CMAKE_CURRENT_LIST_DIR}/pw_bit/driver)
+
+set(PWB_INC_DIR ${PWB_DIR}/include)
+set(PWB_IPP_DIR ${PWB_INC_DIR}/ipp)
+set(PWB_SRC_DIR ${PWB_DIR}/src)
+
 #########################
 # Gather Target Sources #
 #########################
@@ -58,6 +64,11 @@ set(PWM_IPP_FILES ${PWM_IPP_DIR}/periph_pwm.ipp)
 set(PWM_SRC_FILES ${PWM_SRC_DIR}/periph_pwm.cpp)
 
 set(TEST_PWM_SRC_FILES ${PWM_DIR}/test/test_pwm.cpp PARENT_SCOPE)
+
+set(PWB_INC_FILES ${PWB_INC_DIR}/periph_pw_bit.hpp)
+set(PWB_SRC_FILES ${PWB_SRC_DIR}/periph_pw_bit.cpp)
+
+set(TEST_PWB_SRC_FILES ${PWB_DIR}/test/test_pw_bit.cpp PARENT_SCOPE)
 
 ############################
 # Configure Library Target #
@@ -70,6 +81,8 @@ add_library(
         ${PWM_INC_FILES}
         ${PWM_IPP_FILES}
         ${PWM_SRC_FILES}
+        ${PWB_INC_FILES}
+        ${PWB_SRC_FILES}
 )
 # set include directories
 target_include_directories(
@@ -77,4 +90,5 @@ target_include_directories(
     PUBLIC
         ${PWM_INC_DIR}
         ${PWM_IPP_DIR}
+        ${PWB_INC_DIR}
 )
