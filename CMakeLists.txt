@@ -13,30 +13,22 @@ set(CMAKE_CXX_STANDARD_REQUIRED TRUE)
 
 # set the policy to enable inter-procedural optimization if available
 if(POLICY CMP0069)
-    cmake_policy(SET CMP0069 NEW)
+	cmake_policy(SET CMP0069 NEW)
 endif()
-if(NOT DEFINED IPO_SUPPORTED)
-    # check for inter-procedural optimization support
-    include(CheckIPOSupported OPTIONAL RESULT_VARIABLE HAS_CHECK_IPO)
-    if(HAS_CHECK_IPO)
-        message(STATUS "Determining inter-procedural optimization support")
-        
-        check_ipo_supported(RESULT IPO)
-        
-        if(IPO)
-            message(STATUS "Inter-procedural optimization enabled")
-        else()
-            message(STATUS "Inter-procedural optimization disabled")
-        endif()
+if(NOT DEFINED CMAKE_INTERPROCEDURAL_OPTIMIZATION)
+    include(CheckIPOSupported)
+    message(STATUS "Determining inter-procedural optimization support")
+    check_ipo_supported(RESULT CMAKE_INTERPROCEDURAL_OPTIMIZATION)
+    if(CMAKE_INTERPROCEDURAL_OPTIMIZATION)
+        message(STATUS "Inter-procedural optimization enabled")
     else()
-        message(STATUS "Cannot determine inter-procedural optimization support")
-        message(STATUS "Inter-procedural optimization is disabled")
-        
-        set(IPO FALSE)
+        message(STATUS "Inter-procedural optimization disabled")
     endif()
-    
-    set(IPO_SUPPORTED ${IPO} CACHE STRING "Inter-procedural optimization support")
-    set(CMAKE_INTERPROCEDURAL_OPTIMIZATION ${IPO} CACHE INTERNAL "" FORCE)
+    set(
+        CMAKE_INTERPROCEDURAL_OPTIMIZATION
+            ${CMAKE_INTERPROCEDURAL_OPTIMIZATION}
+        CACHE INTERNAL "" FORCE
+    )
 endif()
 
 ######################

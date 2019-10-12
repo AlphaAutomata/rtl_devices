@@ -54,6 +54,22 @@ namespace periph {
             void write( std::uint32_t data );
 
             /**
+             * Check whether or not the output data FIFO is empty.
+             * 
+             * \retval true  The output data FIFO is empty.
+             * \retval false The output data FIFO is not empty.
+             */
+            bool fifo_empty() const;
+
+            /**
+             * Check whether or not the output data FIFO is full.
+             * 
+             * \retval true  The output data FIFO is full.
+             * \retval false The output data FIFO is not full.
+             */
+            bool fifo_full() const;
+
+            /**
              * Set the number of bytes that actually get transmitted when data is written.
              * 
              * On each data write, the lowest \a num_bytes bytes of data are transmitted through the

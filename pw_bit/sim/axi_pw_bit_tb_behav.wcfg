@@ -11,12 +11,12 @@
       </db_ref>
    </db_ref_list>
    <zoom_setting>
-      <ZoomStartTime time="30000000fs"></ZoomStartTime>
-      <ZoomEndTime time="63430000001fs"></ZoomEndTime>
-      <Cursor1Time time="34180000000fs"></Cursor1Time>
+      <ZoomStartTime time="2064102564fs"></ZoomStartTime>
+      <ZoomEndTime time="4913105414fs"></ZoomEndTime>
+      <Cursor1Time time="28062678000fs"></Cursor1Time>
    </zoom_setting>
    <column_width_setting>
-      <NameColumnWidth column_width="275"></NameColumnWidth>
+      <NameColumnWidth column_width="271"></NameColumnWidth>
       <ValueColumnWidth column_width="58"></ValueColumnWidth>
    </column_width_setting>
    <WVObjectSize size="2" />
@@ -47,9 +47,11 @@
       <wvobject fp_name="group1369" type="group">
          <obj_property name="label">s_axi</obj_property>
          <obj_property name="DisplayName">label</obj_property>
+         <obj_property name="isExpanded"></obj_property>
          <wvobject fp_name="group320" type="group">
             <obj_property name="label">s_axi_aw</obj_property>
             <obj_property name="DisplayName">label</obj_property>
+            <obj_property name="isExpanded"></obj_property>
             <wvobject fp_name="/axi_pw_bit_tb/s_axi_awid" type="array">
                <obj_property name="ElementShortName">s_axi_awid[0:0]</obj_property>
                <obj_property name="ObjectShortName">s_axi_awid[0:0]</obj_property>
@@ -75,6 +77,7 @@
          <wvobject fp_name="group321" type="group">
             <obj_property name="label">s_axi_w</obj_property>
             <obj_property name="DisplayName">label</obj_property>
+            <obj_property name="isExpanded"></obj_property>
             <wvobject fp_name="/axi_pw_bit_tb/s_axi_wdata" type="array">
                <obj_property name="ElementShortName">s_axi_wdata[31:0]</obj_property>
                <obj_property name="ObjectShortName">s_axi_wdata[31:0]</obj_property>
@@ -96,6 +99,7 @@
          <wvobject fp_name="group322" type="group">
             <obj_property name="label">s_axi_b</obj_property>
             <obj_property name="DisplayName">label</obj_property>
+            <obj_property name="isExpanded"></obj_property>
             <wvobject fp_name="/axi_pw_bit_tb/s_axi_bid" type="array">
                <obj_property name="ElementShortName">s_axi_bid[0:0]</obj_property>
                <obj_property name="ObjectShortName">s_axi_bid[0:0]</obj_property>
@@ -116,6 +120,7 @@
          <wvobject fp_name="group323" type="group">
             <obj_property name="label">s_axi_ar</obj_property>
             <obj_property name="DisplayName">label</obj_property>
+            <obj_property name="isExpanded"></obj_property>
             <wvobject fp_name="/axi_pw_bit_tb/s_axi_arid" type="array">
                <obj_property name="ElementShortName">s_axi_arid[0:0]</obj_property>
                <obj_property name="ObjectShortName">s_axi_arid[0:0]</obj_property>
@@ -141,6 +146,7 @@
          <wvobject fp_name="group324" type="group">
             <obj_property name="label">s_axi_r</obj_property>
             <obj_property name="DisplayName">label</obj_property>
+            <obj_property name="isExpanded"></obj_property>
             <wvobject fp_name="/axi_pw_bit_tb/s_axi_rid" type="array">
                <obj_property name="ElementShortName">s_axi_rid[0:0]</obj_property>
                <obj_property name="ObjectShortName">s_axi_rid[0:0]</obj_property>
@@ -382,294 +388,6 @@
             <obj_property name="ObjectShortName">regs[31:0][31:0]</obj_property>
             <obj_property name="isExpanded"></obj_property>
             <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
-            <wvobject fp_name="/axi_pw_bit_tb/dut/regs[31]" type="array">
-               <obj_property name="ElementShortName">[31][31:0]</obj_property>
-               <obj_property name="ObjectShortName">[31][31:0]</obj_property>
-               <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
-            </wvobject>
-            <wvobject fp_name="/axi_pw_bit_tb/dut/regs[30]" type="array">
-               <obj_property name="ElementShortName">[30][31:0]</obj_property>
-               <obj_property name="ObjectShortName">[30][31:0]</obj_property>
-               <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
-            </wvobject>
-            <wvobject fp_name="/axi_pw_bit_tb/dut/regs[29]" type="array">
-               <obj_property name="ElementShortName">[29][31:0]</obj_property>
-               <obj_property name="ObjectShortName">[29][31:0]</obj_property>
-               <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
-            </wvobject>
-            <wvobject fp_name="/axi_pw_bit_tb/dut/regs[28]" type="array">
-               <obj_property name="ElementShortName">[28][31:0]</obj_property>
-               <obj_property name="ObjectShortName">[28][31:0]</obj_property>
-               <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
-            </wvobject>
-            <wvobject fp_name="/axi_pw_bit_tb/dut/regs[27]" type="array">
-               <obj_property name="ElementShortName">[27][31:0]</obj_property>
-               <obj_property name="ObjectShortName">[27][31:0]</obj_property>
-               <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
-            </wvobject>
-            <wvobject fp_name="/axi_pw_bit_tb/dut/regs[26]" type="array">
-               <obj_property name="ElementShortName">[26][31:0]</obj_property>
-               <obj_property name="ObjectShortName">[26][31:0]</obj_property>
-               <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
-            </wvobject>
-            <wvobject fp_name="/axi_pw_bit_tb/dut/regs[25]" type="array">
-               <obj_property name="ElementShortName">[25][31:0]</obj_property>
-               <obj_property name="ObjectShortName">[25][31:0]</obj_property>
-               <obj_property name="Radix">HEXRADIX</obj_property>
-            </wvobject>
-            <wvobject fp_name="/axi_pw_bit_tb/dut/regs[24]" type="array">
-               <obj_property name="ElementShortName">[24][31:0]</obj_property>
-               <obj_property name="ObjectShortName">[24][31:0]</obj_property>
-               <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
-            </wvobject>
-            <wvobject fp_name="/axi_pw_bit_tb/dut/regs[23]" type="array">
-               <obj_property name="ElementShortName">[23][31:0]</obj_property>
-               <obj_property name="ObjectShortName">[23][31:0]</obj_property>
-               <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
-            </wvobject>
-            <wvobject fp_name="/axi_pw_bit_tb/dut/regs[22]" type="array">
-               <obj_property name="ElementShortName">[22][31:0]</obj_property>
-               <obj_property name="ObjectShortName">[22][31:0]</obj_property>
-               <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
-            </wvobject>
-            <wvobject fp_name="/axi_pw_bit_tb/dut/regs[21]" type="array">
-               <obj_property name="ElementShortName">[21][31:0]</obj_property>
-               <obj_property name="ObjectShortName">[21][31:0]</obj_property>
-               <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
-            </wvobject>
-            <wvobject fp_name="/axi_pw_bit_tb/dut/regs[20]" type="array">
-               <obj_property name="ElementShortName">[20][31:0]</obj_property>
-               <obj_property name="ObjectShortName">[20][31:0]</obj_property>
-               <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
-            </wvobject>
-            <wvobject fp_name="/axi_pw_bit_tb/dut/regs[19]" type="array">
-               <obj_property name="ElementShortName">[19][31:0]</obj_property>
-               <obj_property name="ObjectShortName">[19][31:0]</obj_property>
-               <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
-            </wvobject>
-            <wvobject fp_name="/axi_pw_bit_tb/dut/regs[18]" type="array">
-               <obj_property name="ElementShortName">[18][31:0]</obj_property>
-               <obj_property name="ObjectShortName">[18][31:0]</obj_property>
-               <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
-            </wvobject>
-            <wvobject fp_name="/axi_pw_bit_tb/dut/regs[17]" type="array">
-               <obj_property name="ElementShortName">[17][31:0]</obj_property>
-               <obj_property name="ObjectShortName">[17][31:0]</obj_property>
-               <obj_property name="Radix">HEXRADIX</obj_property>
-            </wvobject>
-            <wvobject fp_name="/axi_pw_bit_tb/dut/regs[16]" type="array">
-               <obj_property name="ElementShortName">[16][31:0]</obj_property>
-               <obj_property name="ObjectShortName">[16][31:0]</obj_property>
-               <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
-            </wvobject>
-            <wvobject fp_name="/axi_pw_bit_tb/dut/regs[15]" type="array">
-               <obj_property name="ElementShortName">[15][31:0]</obj_property>
-               <obj_property name="ObjectShortName">[15][31:0]</obj_property>
-               <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
-            </wvobject>
-            <wvobject fp_name="/axi_pw_bit_tb/dut/regs[14]" type="array">
-               <obj_property name="ElementShortName">[14][31:0]</obj_property>
-               <obj_property name="ObjectShortName">[14][31:0]</obj_property>
-               <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
-            </wvobject>
-            <wvobject fp_name="/axi_pw_bit_tb/dut/regs[13]" type="array">
-               <obj_property name="ElementShortName">[13][31:0]</obj_property>
-               <obj_property name="ObjectShortName">[13][31:0]</obj_property>
-               <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
-            </wvobject>
-            <wvobject fp_name="/axi_pw_bit_tb/dut/regs[12]" type="array">
-               <obj_property name="ElementShortName">[12][31:0]</obj_property>
-               <obj_property name="ObjectShortName">[12][31:0]</obj_property>
-               <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
-            </wvobject>
-            <wvobject fp_name="/axi_pw_bit_tb/dut/regs[11]" type="array">
-               <obj_property name="ElementShortName">[11][31:0]</obj_property>
-               <obj_property name="ObjectShortName">[11][31:0]</obj_property>
-               <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
-            </wvobject>
-            <wvobject fp_name="/axi_pw_bit_tb/dut/regs[10]" type="array">
-               <obj_property name="ElementShortName">[10][31:0]</obj_property>
-               <obj_property name="ObjectShortName">[10][31:0]</obj_property>
-               <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
-            </wvobject>
-            <wvobject fp_name="/axi_pw_bit_tb/dut/regs[9]" type="array">
-               <obj_property name="ElementShortName">[9][31:0]</obj_property>
-               <obj_property name="ObjectShortName">[9][31:0]</obj_property>
-               <obj_property name="Radix">HEXRADIX</obj_property>
-            </wvobject>
-            <wvobject fp_name="/axi_pw_bit_tb/dut/regs[8]" type="array">
-               <obj_property name="ElementShortName">[8][31:0]</obj_property>
-               <obj_property name="ObjectShortName">[8][31:0]</obj_property>
-               <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
-            </wvobject>
-            <wvobject fp_name="/axi_pw_bit_tb/dut/regs[7]" type="array">
-               <obj_property name="ElementShortName">[7][31:0]</obj_property>
-               <obj_property name="ObjectShortName">[7][31:0]</obj_property>
-               <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
-            </wvobject>
-            <wvobject fp_name="/axi_pw_bit_tb/dut/regs[6]" type="array">
-               <obj_property name="ElementShortName">[6][31:0]</obj_property>
-               <obj_property name="ObjectShortName">[6][31:0]</obj_property>
-               <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
-            </wvobject>
-            <wvobject fp_name="/axi_pw_bit_tb/dut/regs[5]" type="array">
-               <obj_property name="ElementShortName">[5][31:0]</obj_property>
-               <obj_property name="ObjectShortName">[5][31:0]</obj_property>
-               <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
-            </wvobject>
-            <wvobject fp_name="/axi_pw_bit_tb/dut/regs[4]" type="array">
-               <obj_property name="ElementShortName">[4][31:0]</obj_property>
-               <obj_property name="ObjectShortName">[4][31:0]</obj_property>
-               <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
-            </wvobject>
-            <wvobject fp_name="/axi_pw_bit_tb/dut/regs[3]" type="array">
-               <obj_property name="ElementShortName">[3][31:0]</obj_property>
-               <obj_property name="ObjectShortName">[3][31:0]</obj_property>
-               <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
-            </wvobject>
-            <wvobject fp_name="/axi_pw_bit_tb/dut/regs[2]" type="array">
-               <obj_property name="ElementShortName">[2][31:0]</obj_property>
-               <obj_property name="ObjectShortName">[2][31:0]</obj_property>
-               <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
-            </wvobject>
-            <wvobject fp_name="/axi_pw_bit_tb/dut/regs[1]" type="array">
-               <obj_property name="ElementShortName">[1][31:0]</obj_property>
-               <obj_property name="ObjectShortName">[1][31:0]</obj_property>
-               <obj_property name="Radix">HEXRADIX</obj_property>
-            </wvobject>
-            <wvobject fp_name="/axi_pw_bit_tb/dut/regs[0]" type="array">
-               <obj_property name="ElementShortName">[0][31:0]</obj_property>
-               <obj_property name="ObjectShortName">[0][31:0]</obj_property>
-               <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
-            </wvobject>
-            <wvobject fp_name="/axi_pw_bit_tb/dut/regs[31]" type="array">
-               <obj_property name="ElementShortName">[31][31:0]</obj_property>
-               <obj_property name="ObjectShortName">[31][31:0]</obj_property>
-            </wvobject>
-            <wvobject fp_name="/axi_pw_bit_tb/dut/regs[30]" type="array">
-               <obj_property name="ElementShortName">[30][31:0]</obj_property>
-               <obj_property name="ObjectShortName">[30][31:0]</obj_property>
-            </wvobject>
-            <wvobject fp_name="/axi_pw_bit_tb/dut/regs[29]" type="array">
-               <obj_property name="ElementShortName">[29][31:0]</obj_property>
-               <obj_property name="ObjectShortName">[29][31:0]</obj_property>
-            </wvobject>
-            <wvobject fp_name="/axi_pw_bit_tb/dut/regs[28]" type="array">
-               <obj_property name="ElementShortName">[28][31:0]</obj_property>
-               <obj_property name="ObjectShortName">[28][31:0]</obj_property>
-            </wvobject>
-            <wvobject fp_name="/axi_pw_bit_tb/dut/regs[27]" type="array">
-               <obj_property name="ElementShortName">[27][31:0]</obj_property>
-               <obj_property name="ObjectShortName">[27][31:0]</obj_property>
-            </wvobject>
-            <wvobject fp_name="/axi_pw_bit_tb/dut/regs[26]" type="array">
-               <obj_property name="ElementShortName">[26][31:0]</obj_property>
-               <obj_property name="ObjectShortName">[26][31:0]</obj_property>
-            </wvobject>
-            <wvobject fp_name="/axi_pw_bit_tb/dut/regs[25]" type="array">
-               <obj_property name="ElementShortName">[25][31:0]</obj_property>
-               <obj_property name="ObjectShortName">[25][31:0]</obj_property>
-            </wvobject>
-            <wvobject fp_name="/axi_pw_bit_tb/dut/regs[24]" type="array">
-               <obj_property name="ElementShortName">[24][31:0]</obj_property>
-               <obj_property name="ObjectShortName">[24][31:0]</obj_property>
-            </wvobject>
-            <wvobject fp_name="/axi_pw_bit_tb/dut/regs[23]" type="array">
-               <obj_property name="ElementShortName">[23][31:0]</obj_property>
-               <obj_property name="ObjectShortName">[23][31:0]</obj_property>
-            </wvobject>
-            <wvobject fp_name="/axi_pw_bit_tb/dut/regs[22]" type="array">
-               <obj_property name="ElementShortName">[22][31:0]</obj_property>
-               <obj_property name="ObjectShortName">[22][31:0]</obj_property>
-            </wvobject>
-            <wvobject fp_name="/axi_pw_bit_tb/dut/regs[21]" type="array">
-               <obj_property name="ElementShortName">[21][31:0]</obj_property>
-               <obj_property name="ObjectShortName">[21][31:0]</obj_property>
-            </wvobject>
-            <wvobject fp_name="/axi_pw_bit_tb/dut/regs[20]" type="array">
-               <obj_property name="ElementShortName">[20][31:0]</obj_property>
-               <obj_property name="ObjectShortName">[20][31:0]</obj_property>
-            </wvobject>
-            <wvobject fp_name="/axi_pw_bit_tb/dut/regs[19]" type="array">
-               <obj_property name="ElementShortName">[19][31:0]</obj_property>
-               <obj_property name="ObjectShortName">[19][31:0]</obj_property>
-            </wvobject>
-            <wvobject fp_name="/axi_pw_bit_tb/dut/regs[18]" type="array">
-               <obj_property name="ElementShortName">[18][31:0]</obj_property>
-               <obj_property name="ObjectShortName">[18][31:0]</obj_property>
-            </wvobject>
-            <wvobject fp_name="/axi_pw_bit_tb/dut/regs[17]" type="array">
-               <obj_property name="ElementShortName">[17][31:0]</obj_property>
-               <obj_property name="ObjectShortName">[17][31:0]</obj_property>
-            </wvobject>
-            <wvobject fp_name="/axi_pw_bit_tb/dut/regs[16]" type="array">
-               <obj_property name="ElementShortName">[16][31:0]</obj_property>
-               <obj_property name="ObjectShortName">[16][31:0]</obj_property>
-            </wvobject>
-            <wvobject fp_name="/axi_pw_bit_tb/dut/regs[15]" type="array">
-               <obj_property name="ElementShortName">[15][31:0]</obj_property>
-               <obj_property name="ObjectShortName">[15][31:0]</obj_property>
-            </wvobject>
-            <wvobject fp_name="/axi_pw_bit_tb/dut/regs[14]" type="array">
-               <obj_property name="ElementShortName">[14][31:0]</obj_property>
-               <obj_property name="ObjectShortName">[14][31:0]</obj_property>
-            </wvobject>
-            <wvobject fp_name="/axi_pw_bit_tb/dut/regs[13]" type="array">
-               <obj_property name="ElementShortName">[13][31:0]</obj_property>
-               <obj_property name="ObjectShortName">[13][31:0]</obj_property>
-            </wvobject>
-            <wvobject fp_name="/axi_pw_bit_tb/dut/regs[12]" type="array">
-               <obj_property name="ElementShortName">[12][31:0]</obj_property>
-               <obj_property name="ObjectShortName">[12][31:0]</obj_property>
-            </wvobject>
-            <wvobject fp_name="/axi_pw_bit_tb/dut/regs[11]" type="array">
-               <obj_property name="ElementShortName">[11][31:0]</obj_property>
-               <obj_property name="ObjectShortName">[11][31:0]</obj_property>
-            </wvobject>
-            <wvobject fp_name="/axi_pw_bit_tb/dut/regs[10]" type="array">
-               <obj_property name="ElementShortName">[10][31:0]</obj_property>
-               <obj_property name="ObjectShortName">[10][31:0]</obj_property>
-            </wvobject>
-            <wvobject fp_name="/axi_pw_bit_tb/dut/regs[9]" type="array">
-               <obj_property name="ElementShortName">[9][31:0]</obj_property>
-               <obj_property name="ObjectShortName">[9][31:0]</obj_property>
-            </wvobject>
-            <wvobject fp_name="/axi_pw_bit_tb/dut/regs[8]" type="array">
-               <obj_property name="ElementShortName">[8][31:0]</obj_property>
-               <obj_property name="ObjectShortName">[8][31:0]</obj_property>
-            </wvobject>
-            <wvobject fp_name="/axi_pw_bit_tb/dut/regs[7]" type="array">
-               <obj_property name="ElementShortName">[7][31:0]</obj_property>
-               <obj_property name="ObjectShortName">[7][31:0]</obj_property>
-            </wvobject>
-            <wvobject fp_name="/axi_pw_bit_tb/dut/regs[6]" type="array">
-               <obj_property name="ElementShortName">[6][31:0]</obj_property>
-               <obj_property name="ObjectShortName">[6][31:0]</obj_property>
-            </wvobject>
-            <wvobject fp_name="/axi_pw_bit_tb/dut/regs[5]" type="array">
-               <obj_property name="ElementShortName">[5][31:0]</obj_property>
-               <obj_property name="ObjectShortName">[5][31:0]</obj_property>
-            </wvobject>
-            <wvobject fp_name="/axi_pw_bit_tb/dut/regs[4]" type="array">
-               <obj_property name="ElementShortName">[4][31:0]</obj_property>
-               <obj_property name="ObjectShortName">[4][31:0]</obj_property>
-            </wvobject>
-            <wvobject fp_name="/axi_pw_bit_tb/dut/regs[3]" type="array">
-               <obj_property name="ElementShortName">[3][31:0]</obj_property>
-               <obj_property name="ObjectShortName">[3][31:0]</obj_property>
-            </wvobject>
-            <wvobject fp_name="/axi_pw_bit_tb/dut/regs[2]" type="array">
-               <obj_property name="ElementShortName">[2][31:0]</obj_property>
-               <obj_property name="ObjectShortName">[2][31:0]</obj_property>
-            </wvobject>
-            <wvobject fp_name="/axi_pw_bit_tb/dut/regs[1]" type="array">
-               <obj_property name="ElementShortName">[1][31:0]</obj_property>
-               <obj_property name="ObjectShortName">[1][31:0]</obj_property>
-            </wvobject>
-            <wvobject fp_name="/axi_pw_bit_tb/dut/regs[0]" type="array">
-               <obj_property name="ElementShortName">[0][31:0]</obj_property>
-               <obj_property name="ObjectShortName">[0][31:0]</obj_property>
-            </wvobject>
          </wvobject>
          <wvobject fp_name="/axi_pw_bit_tb/dut/regs_next" type="array">
             <obj_property name="ElementShortName">regs_next[31:0][31:0]</obj_property>
@@ -691,9 +409,11 @@
          <wvobject fp_name="group10975" type="group">
             <obj_property name="label">top</obj_property>
             <obj_property name="DisplayName">label</obj_property>
+            <obj_property name="isExpanded"></obj_property>
             <wvobject fp_name="group9805" type="group">
                <obj_property name="label">cell_s_axis</obj_property>
                <obj_property name="DisplayName">label</obj_property>
+               <obj_property name="isExpanded"></obj_property>
                <wvobject fp_name="/axi_pw_bit_tb/dut/\GEN_CELLS(0)\/cell_s_axis_tdata" type="array">
                   <obj_property name="ElementShortName">cell_s_axis_tdata[31:0]</obj_property>
                   <obj_property name="ObjectShortName">cell_s_axis_tdata[31:0]</obj_property>
@@ -718,6 +438,7 @@
             <wvobject fp_name="group9804" type="group">
                <obj_property name="label">fifo</obj_property>
                <obj_property name="DisplayName">label</obj_property>
+               <obj_property name="isExpanded"></obj_property>
                <wvobject fp_name="/axi_pw_bit_tb/dut/\GEN_CELLS(0)\/fifo_wren" type="logic">
                   <obj_property name="ElementShortName">fifo_wren</obj_property>
                   <obj_property name="ObjectShortName">fifo_wren</obj_property>
@@ -733,6 +454,10 @@
                <wvobject fp_name="/axi_pw_bit_tb/dut/\GEN_CELLS(0)\/fifo_do" type="array">
                   <obj_property name="ElementShortName">fifo_do[35:0]</obj_property>
                   <obj_property name="ObjectShortName">fifo_do[35:0]</obj_property>
+               </wvobject>
+               <wvobject fp_name="/axi_pw_bit_tb/dut/\GEN_CELLS(0)\/fifo_full" type="logic">
+                  <obj_property name="ElementShortName">fifo_full</obj_property>
+                  <obj_property name="ObjectShortName">fifo_full</obj_property>
                </wvobject>
                <wvobject fp_name="/axi_pw_bit_tb/dut/\GEN_CELLS(0)\/fifo_empty" type="logic">
                   <obj_property name="ElementShortName">fifo_empty</obj_property>

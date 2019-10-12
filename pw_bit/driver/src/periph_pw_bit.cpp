@@ -10,14 +10,22 @@ namespace {
      * Register-wise access struct for pulse-width-bit peripheral memory-mapped registers.
      */
     struct memory_map {
-        volatile std::atomic_uint32_t fifo_write;    //!< Data FIFO write register.
-        volatile std::uint32_t        byte_mask;     //!< Byte mask register.
-        volatile std::uint32_t        RESERVED_0x08; //!< Reserved.
-        volatile std::uint32_t        RESERVED_0x0C; //!< Reserved.
-        volatile std::uint32_t        period;        //!< Bit period register.
-        volatile std::uint32_t        duty_1b;       //!< 1-bit duty time register.
-        volatile std::uint32_t        duty_0b;       //!< 0-bit duty time register.
-        volatile std::uint32_t        cfg;           //!< Enable register.
+        volatile       std::atomic_uint32_t fifo_write;    //!< Data FIFO write register.
+        volatile       std::uint32_t        byte_mask;     //!< Byte mask register.
+        volatile const std::uint32_t        RESERVED_0x08; //!< Reserved.
+        volatile const std::uint32_t        RESERVED_0x0C; //!< Reserved.
+        volatile       std::uint32_t        period;        //!< Bit period register.
+        volatile       std::uint32_t        duty_1b;       //!< 1-bit duty time register.
+        volatile       std::uint32_t        duty_0b;       //!< 0-bit duty time register.
+        union {
+            struct {
+                volatile const std::uint32_t RESERVED_0x1C : 29; //!< Reserved.
+                volatile const bool          full          : 1;  //!< FIFO full bit.
+                volatile const bool          empty         : 1;  //!< FIFO empty bit.
+                volatile       std::uint32_t rst           : 1;  //!< Enable bit.
+            } b;
+            volatile std::uint32_t w;
+        } cfg;
 
         /**
          * Copy configurations from another pulse-width-bit memory block.
@@ -31,7 +39,7 @@ namespace {
             this->period = rhs.period;
             this->duty_1b = rhs.duty_1b;
             this->duty_0b = rhs.duty_0b;
-            this->cfg = rhs.cfg;
+            this->cfg.b.rst = rhs.cfg.b.rst;
 
             return *this;
         }
@@ -80,21 +88,29 @@ pw_bit& pw_bit::operator=( pw_bit&& rhs ) {
     other_map.period = 0;
     other_map.duty_1b = 0;
     other_map.duty_0b = 0;
-    other_map.cfg = 0;
+    other_map.cfg.b.rst = 0;
 
     return *this;
 }
 
 void pw_bit::enable() {
-    to_map( *this ).cfg = 1;
+    to_map( *this ).cfg.w = 1;
 }
 
 void pw_bit::disable() {
-    to_map( *this ).cfg = 0;
+    to_map( *this ).cfg.w = 0;
 }
 
 void pw_bit::write( std::uint32_t data ) {
     to_map( *this ).fifo_write = data;
+}
+
+bool pw_bit::fifo_empty() const {
+    return to_map( *this ).cfg.b.empty;
+}
+
+bool pw_bit::fifo_full() const {
+    return to_map( *this ).cfg.b.full;
 }
 
 void pw_bit::set_active_bytes( int num_bytes ) {

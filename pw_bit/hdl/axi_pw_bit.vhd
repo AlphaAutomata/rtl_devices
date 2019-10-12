@@ -155,6 +155,13 @@ architecture arch of axi_pw_bit is
     
     signal reg_index_from_araddr     : integer;
     signal reg_index_from_awaddr_reg : integer;
+
+    ---------------------
+    -- Register Access --
+    ---------------------
+
+    signal fifos_full  : std_logic_vector(NUM_OUTPUTS-1 downto 0);
+    signal fifos_empty : std_logic_vector(NUM_OUTPUTS-1 downto 0);
 begin
     --------------------------
     -- AXI-4 Lite Registers --
@@ -315,7 +322,6 @@ begin
                 s_axi_rvalid      <= '0';
                 wr_state          <= idle;
                 rd_state          <= idle;
-                regs              <= (others => (others => '0'));
             else
                 s_axi_awid_reg    <= s_axi_awid_reg_next   ;
                 s_axi_awaddr_reg  <= s_axi_awaddr_reg_next ;
@@ -333,10 +339,30 @@ begin
                 s_axi_rvalid      <= s_axi_rvalid_next     ;
                 wr_state          <= wr_state_next         ;
                 rd_state          <= rd_state_next         ;
-                regs              <= regs_next             ;
             end if;
         end if;
     end process;
+
+    GEN_REG_STORE : for i in 0 to NUM_OUTPUTS-1 generate
+    begin
+        regs(8*i+7)(2) <= fifos_full(i) ;
+        regs(8*i+7)(1) <= fifos_empty(i);
+
+        process (aclk) begin
+            if (rising_edge(aclk)) then
+                if (aresetn = '0') then
+                    regs(8*i+7)(AXI_DATA_WIDTH-1 downto 3) <= (others => '0');
+                    regs(8*i+7)(0)                         <= '0';
+                    regs(8*i+6 downto 8*i)                 <= (others => (others => '0'));
+                else
+                    regs(8*i+7)(AXI_DATA_WIDTH-1 downto 3)
+                                           <= regs_next(8*i+7)(AXI_DATA_WIDTH-1 downto 3);
+                    regs(8*i+7)(0)         <= regs_next(8*i+7)(0);
+                    regs(8*i+6 downto 8*i) <= regs_next(8*i+6 downto 8*i);
+                end if;
+            end if;
+        end process;
+    end generate GEN_REG_STORE;
 
     ------------------------
     -- PWM Cell Instances --
@@ -381,6 +407,7 @@ begin
 
         signal fifo_wren : std_logic;
         signal fifo_di   : std_logic_vector(FIFO_DATA_WIDTH-1 downto 0);
+        signal fifo_full : std_logic;
 
         signal cell_s_axis_tdata  : std_logic_vector(AXI_DATA_WIDTH-1 downto 0);
         signal cell_s_axis_tstrb  : std_logic_vector(AXI_DATA_WIDTH/8-1 downto 0);
@@ -393,6 +420,9 @@ begin
         signal fifo_empty : std_logic;
     begin
         cell_aresetn <= regs(cfg_reg_addr)(0) and aresetn;
+
+        fifos_full(i)  <= fifo_full;
+        fifos_empty(i) <= fifo_empty;
 
         fifo_wren <=
             s_axi_wvalid and s_axi_wready when (reg_index_from_awaddr_reg = data_reg_addr) else
@@ -412,7 +442,7 @@ begin
             wren        => fifo_wren,       -- 1-bit input write enable
             di          => fifo_di,         -- Input data, width defined by DATA_WIDTH parameter
             almostfull  => open,            -- 1-bit output almost full
-            full        => open,            -- 1-bit output full
+            full        => fifo_full,       -- 1-bit output full
             wrcount     => open,            -- Output write count, width determined by FIFO depth
             wrerr       => open,            -- 1-bit output write error
 
