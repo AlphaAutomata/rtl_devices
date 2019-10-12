@@ -8,38 +8,38 @@ module axi_pw_bit_tb();
     localparam NUM_OUTPUTS    = 4;
     
     localparam [31:0][AXI_DATA_WIDTH-1:0] regs_values = {
-        32'd0 ,
-        32'd15,
-        32'd30,
-        32'd60,
-        32'd0 ,
-        32'd0 ,
+        32'd1  ,
+        32'd40 ,
+        32'd80 ,
+        32'd125,
+        32'd0  ,
+        32'd0  ,
         32'h00000007,
-        32'd0 ,
-        32'd0 ,
-        32'd15,
-        32'd30,
-        32'd60,
-        32'd0 ,
-        32'd0 ,
+        32'd0  ,
+        32'd1  ,
+        32'd40 ,
+        32'd80 ,
+        32'd125,
+        32'd0  ,
+        32'd0  ,
         32'h00000007,
-        32'd0 ,
-        32'd0 ,
-        32'd15,
-        32'd30,
-        32'd60,
-        32'd0 ,
-        32'd0 ,
+        32'd0  ,
+        32'd1  ,
+        32'd40 ,
+        32'd80 ,
+        32'd125,
+        32'd0  ,
+        32'd0  ,
         32'h00000007,
-        32'd0 ,
-        32'd0 ,
-        32'd15,
-        32'd30,
-        32'd60,
-        32'd0 ,
-        32'd0 ,
+        32'd0  ,
+        32'd1  ,
+        32'd40 ,
+        32'd80 ,
+        32'd125,
+        32'd0  ,
+        32'd0  ,
         32'h00000007,
-        32'd0 
+        32'd0  
     };
     
     reg [31:0][AXI_DATA_WIDTH-1:0] regs;
@@ -160,7 +160,7 @@ module axi_pw_bit_tb();
     always @(posedge(aclk)) begin
         if (aresetn == 1) begin
             if (write_cntdwn == 0) begin
-                write_cntdwn <= 3000;
+                write_cntdwn <= 2000;
                 reg_number   <= 31;
                 regs[0]      <= regs[0] + 1;
                 regs[8]      <= regs[8] + 1;

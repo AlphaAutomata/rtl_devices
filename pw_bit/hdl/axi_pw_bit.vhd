@@ -348,10 +348,13 @@ begin
         constant period_reg_addr     : integer := 8*i+4;
         constant duty_hi_reg_addr    : integer := 8*i+5;
         constant duty_lo_reg_addr    : integer := 8*i+6;
+        constant cfg_reg_addr        : integer := 8*i+7;
 
         constant BMASK_NUM_BITS : integer := AXI_DATA_WIDTH/8;
 
         constant FIFO_DATA_WIDTH : integer := AXI_DATA_WIDTH + BMASK_NUM_BITS;
+
+        signal cell_aresetn : std_logic;
 
         component pw_bit_cell is
             generic (
@@ -389,6 +392,8 @@ begin
         signal fifo_do    : std_logic_vector(FIFO_DATA_WIDTH-1 downto 0);
         signal fifo_empty : std_logic;
     begin
+        cell_aresetn <= regs(cfg_reg_addr)(0) and aresetn;
+
         fifo_wren <=
             s_axi_wvalid and s_axi_wready when (reg_index_from_awaddr_reg = data_reg_addr) else
             '0';
@@ -404,22 +409,22 @@ begin
             DATA_WIDTH          => FIFO_DATA_WIDTH, -- Valid values are 1-72 (37-72 only valid when FIFO_SIZE="36Kb")
             FIFO_SIZE           => "36Kb")          -- Target BRAM, "18Kb" or "36Kb"
         port map (
-            wren        => fifo_wren,  -- 1-bit input write enable
-            di          => fifo_di,    -- Input data, width defined by DATA_WIDTH parameter
-            almostfull  => open,       -- 1-bit output almost full
-            full        => open,       -- 1-bit output full
-            wrcount     => open,       -- Output write count, width determined by FIFO depth
-            wrerr       => open,       -- 1-bit output write error
+            wren        => fifo_wren,       -- 1-bit input write enable
+            di          => fifo_di,         -- Input data, width defined by DATA_WIDTH parameter
+            almostfull  => open,            -- 1-bit output almost full
+            full        => open,            -- 1-bit output full
+            wrcount     => open,            -- Output write count, width determined by FIFO depth
+            wrerr       => open,            -- 1-bit output write error
 
-            rden        => fifo_rden,  -- 1-bit input read enable
-            do          => fifo_do,    -- Output data, width defined by DATA_WIDTH parameter
-            almostempty => open,       -- 1-bit output almost empty
-            empty       => fifo_empty, -- 1-bit output empty
-            rdcount     => open,       -- Output read count, width determined by FIFO depth
-            rderr       => open,       -- 1-bit output read error
+            rden        => fifo_rden,       -- 1-bit input read enable
+            do          => fifo_do,         -- Output data, width defined by DATA_WIDTH parameter
+            almostempty => open,            -- 1-bit output almost empty
+            empty       => fifo_empty,      -- 1-bit output empty
+            rdcount     => open,            -- Output read count, width determined by FIFO depth
+            rderr       => open,            -- 1-bit output read error
 
-            clk         => aclk,       -- 1-bit input clock
-            rst         => not aresetn -- 1-bit input reset
+            clk         => aclk,            -- 1-bit input clock
+            rst         => not cell_aresetn -- 1-bit input reset
         );
 
         cell_s_axis_tdata  <= fifo_do(AXI_DATA_WIDTH-1 downto 0);
@@ -428,7 +433,7 @@ begin
 
         process (aclk) begin
             if (rising_edge(aclk)) then
-                if (aresetn = '0') then
+                if (cell_aresetn = '0') then
                     cell_s_axis_tvalid <= '0';
                 else
                     cell_s_axis_tvalid <= fifo_rden;
@@ -453,8 +458,8 @@ begin
             duty_hi => regs(duty_hi_reg_addr),
             duty_lo => regs(duty_lo_reg_addr),
 
-            aclk    => aclk   ,
-            aresetn => aresetn
+            aclk    => aclk        ,
+            aresetn => cell_aresetn
         );
     end generate GEN_CELLS;
 end arch;
