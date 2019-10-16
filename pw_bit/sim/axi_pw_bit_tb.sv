@@ -14,7 +14,7 @@ module axi_pw_bit_tb();
         32'd125,
         32'd0  ,
         32'd0  ,
-        32'h00000007,
+        32'h00000001,
         32'd0  ,
         32'd1  ,
         32'd40 ,
@@ -22,7 +22,7 @@ module axi_pw_bit_tb();
         32'd125,
         32'd0  ,
         32'd0  ,
-        32'h00000007,
+        32'h00000001,
         32'd0  ,
         32'd1  ,
         32'd40 ,
@@ -30,7 +30,7 @@ module axi_pw_bit_tb();
         32'd125,
         32'd0  ,
         32'd0  ,
-        32'h00000007,
+        32'h00000001,
         32'd0  ,
         32'd1  ,
         32'd40 ,
@@ -38,10 +38,12 @@ module axi_pw_bit_tb();
         32'd125,
         32'd0  ,
         32'd0  ,
-        32'h00000007,
+        32'h00000001,
         32'd0  
     };
-    
+
+    reg init_done;
+
     reg [31:0][AXI_DATA_WIDTH-1:0] regs;
 
     integer write_cntdwn;
@@ -123,6 +125,8 @@ module axi_pw_bit_tb();
     );
     
     initial begin
+        init_done <= 0;
+
         regs <= regs_values;
 
         write_cntdwn <= 300;
@@ -160,21 +164,33 @@ module axi_pw_bit_tb();
     always @(posedge(aclk)) begin
         if (aresetn == 1) begin
             if (write_cntdwn == 0) begin
-                write_cntdwn <= 2000;
+                write_cntdwn <= 5000;
                 reg_number   <= 31;
                 regs[0]      <= regs[0] + 1;
                 regs[8]      <= regs[8] + 1;
                 regs[16]     <= regs[16] + 1;
                 regs[24]     <= regs[24] + 1;
+                if (regs[0] > 1) begin
+                    init_done <= 1;
+                end
             end else begin
                 write_cntdwn <= write_cntdwn - 1;
             end
 
             if (reg_number >= 0 && s_axi_awvalid == 0) begin
-                reg_number    <= reg_number - 1;
+                if (init_done == 0) begin
+                    reg_number <= reg_number - 1;
+                end else begin
+                    reg_number <= reg_number - 8;
+                end
                 s_axi_awvalid <= 1;
-                s_axi_awaddr  <= 4*reg_number;
-                s_axi_wdata   <= regs[reg_number];
+                if (init_done == 0) begin
+                    s_axi_awaddr <= 4*reg_number;
+                    s_axi_wdata  <= regs[reg_number];
+                end else begin
+                    s_axi_awaddr <= 0;
+                    s_axi_wdata  <= regs[0];
+                end
             end
 
             if (s_axi_awvalid == 1 && s_axi_awready == 1) begin
@@ -185,6 +201,8 @@ module axi_pw_bit_tb();
             if (s_axi_wvalid == 1 && s_axi_wready == 1) begin
                 s_axi_wvalid <= 0;
             end
+        end else begin
+            init_done <= 0;
         end
     end
 endmodule

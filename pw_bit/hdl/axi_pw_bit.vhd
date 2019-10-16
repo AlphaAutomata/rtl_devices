@@ -382,6 +382,32 @@ begin
 
         signal cell_aresetn : std_logic;
 
+        component xfifo_axis_rd is
+            generic (
+                AXIS_DATA_WIDTH : integer := 32
+            );
+            port (
+                fifo_rden  : out std_logic;
+                fifo_do    : in  std_logic_vector(AXIS_DATA_WIDTH-1 downto 0);
+                fifo_empty : in  std_logic;
+
+                m_axis_tdata  : out std_logic_vector(AXIS_DATA_WIDTH-1 downto 0);
+                m_axis_tvalid : out std_logic;
+                m_axis_tready : in  std_logic;
+
+                aclk    : in std_logic;
+                aresetn : in std_logic
+            );
+        end component;
+
+        signal converter_fifo_rden  : std_logic;
+        signal converter_fifo_do    : std_logic_vector(FIFO_DATA_WIDTH-1 downto 0);
+        signal converter_fifo_empty : std_logic;
+
+        signal converter_m_axis_tdata  : std_logic_vector(FIFO_DATA_WIDTH-1 downto 0);
+        signal converter_m_axis_tvalid : std_logic;
+        signal converter_m_axis_tready : std_logic;
+
         component pw_bit_cell is
             generic (
                 COUNTER_WIDTH   : integer := 32;
@@ -429,16 +455,14 @@ begin
             '0';
         fifo_di <= regs(data_bmask_reg_addr)(BMASK_NUM_BITS-1 downto 0) & s_axi_wdata;
 
-        fifo_rden <= cell_s_axis_tready and not fifo_empty;
-
         data_fifo : fifo_sync_macro
         generic map (
             DEVICE              => "7SERIES",       -- Target Device: "VIRTEX5, "VIRTEX6", "7SERIES"
             ALMOST_FULL_OFFSET  => X"0080",         -- Sets almost full threshold
             ALMOST_EMPTY_OFFSET => X"0080",         -- Sets the almost empty threshold
             DATA_WIDTH          => FIFO_DATA_WIDTH, -- Valid values are 1-72 (37-72 only valid when FIFO_SIZE="36Kb")
-            FIFO_SIZE           => "36Kb")          -- Target BRAM, "18Kb" or "36Kb"
-        port map (
+            FIFO_SIZE           => "36Kb"           -- Target BRAM, "18Kb" or "36Kb"
+        ) port map (
             wren        => fifo_wren,       -- 1-bit input write enable
             di          => fifo_di,         -- Input data, width defined by DATA_WIDTH parameter
             almostfull  => open,            -- 1-bit output almost full
@@ -457,19 +481,32 @@ begin
             rst         => not cell_aresetn -- 1-bit input reset
         );
 
-        cell_s_axis_tdata  <= fifo_do(AXI_DATA_WIDTH-1 downto 0);
-        cell_s_axis_tstrb  <= fifo_do(FIFO_DATA_WIDTH-1 downto FIFO_DATA_WIDTH-BMASK_NUM_BITS);
-        cell_s_axis_tlast  <= '0';
+        fifo_rden            <= converter_fifo_rden;
+        converter_fifo_do    <= fifo_do;
+        converter_fifo_empty <= fifo_empty;
 
-        process (aclk) begin
-            if (rising_edge(aclk)) then
-                if (cell_aresetn = '0') then
-                    cell_s_axis_tvalid <= '0';
-                else
-                    cell_s_axis_tvalid <= fifo_rden;
-                end if;
-            end if;
-        end process;
+        converter : xfifo_axis_rd
+        generic map (
+            AXIS_DATA_WIDTH => FIFO_DATA_WIDTH
+        ) port map (
+            fifo_rden     => converter_fifo_rden    ,
+            fifo_do       => converter_fifo_do      ,
+            fifo_empty    => converter_fifo_empty   ,
+
+            m_axis_tdata  => converter_m_axis_tdata ,
+            m_axis_tvalid => converter_m_axis_tvalid,
+            m_axis_tready => converter_m_axis_tready,
+
+            aclk          => aclk,
+            aresetn       => cell_aresetn
+        );
+
+        cell_s_axis_tdata <= converter_m_axis_tdata(AXI_DATA_WIDTH-1 downto 0);
+        cell_s_axis_tstrb <=
+            converter_m_axis_tdata(FIFO_DATA_WIDTH-1 downto FIFO_DATA_WIDTH-BMASK_NUM_BITS);
+        cell_s_axis_tlast       <= '0';
+        cell_s_axis_tvalid      <= converter_m_axis_tvalid;
+        converter_m_axis_tready <= cell_s_axis_tready;
 
         cell : pw_bit_cell
         generic map (
